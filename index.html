@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>tecEdu – ETE Luiz Alves Lacerda</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;font-family:'Segoe UI',Arial,sans-serif}
+  ::-webkit-scrollbar{display:none}
+  body{background:#F0F4FF;display:flex;justify-content:center;min-height:100vh}
+  #app{width:100%;max-width:430px;min-height:100vh;position:relative;overflow:hidden;background:#F0F4FF}
+
+  /* SCREENS */
+  .screen{display:none;min-height:100vh}
+  .screen.active{display:flex;flex-direction:column}
+
+  /* SPLASH */
+  #splash{background:linear-gradient(160deg,#0047AB 0%,#0066CC 60%,#0047AB 100%);
+    align-items:center;justify-content:center;gap:0}
+  .splash-logo{animation:popIn .7s ease forwards;text-align:center;margin-bottom:24px}
+  .ete-card{background:#fff;border-radius:20px;padding:20px 28px;text-align:center;
+    box-shadow:0 12px 48px rgba(0,0,0,.25);margin-bottom:0}
+  .ete-badge{background:#003087;border-radius:10px;padding:10px 20px;margin-bottom:8px;display:inline-block}
+  .ete-badge span{font-size:36px;font-weight:900;letter-spacing:2px;
+    background:linear-gradient(90deg,#FFD700,#FF4444,#00CC44,#FFD700);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .ete-badge small{display:block;color:#fff;font-size:8px;letter-spacing:2px;margin-top:-4px}
+  .ete-school{color:#003087;font-size:13px;font-weight:700;letter-spacing:.5px;margin-top:4px}
+  .splash-title{color:#fff;font-size:32px;font-weight:900;letter-spacing:-1px;
+    animation:fadeUp .8s .4s both;margin-top:24px}
+  .splash-title span{color:#7DD3FC}
+  .splash-sub{color:rgba(255,255,255,.6);font-size:13px;animation:fadeUp .8s .6s both;margin-top:6px}
+  .dots{display:flex;gap:8px;margin-top:40px;animation:fadeUp .8s .8s both}
+  .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.5)}
+  .dot:nth-child(1){animation:blink 1.1s 0s infinite alternate}
+  .dot:nth-child(2){animation:blink 1.1s .2s infinite alternate}
+  .dot:nth-child(3){animation:blink 1.1s .4s infinite alternate}
+
+  /* LOGIN */
+  #login{background:linear-gradient(160deg,#0047AB,#0066CC 50%,#0047AB)}
+  .login-top{padding:56px 28px 36px;text-align:center}
+  .login-ete-card{background:#fff;border-radius:14px;padding:14px 20px;display:inline-block;
+    box-shadow:0 8px 28px rgba(0,0,0,.2);margin-bottom:18px}
+  .login-ete-badge{background:#003087;border-radius:7px;padding:7px 14px;margin-bottom:5px;display:inline-block}
+  .login-ete-badge span{font-size:24px;font-weight:900;letter-spacing:2px;
+    background:linear-gradient(90deg,#FFD700,#FF4444,#00CC44,#FFD700);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .login-ete-badge small{display:block;color:#fff;font-size:7px;letter-spacing:2px}
+  .login-ete-school{color:#003087;font-size:11px;font-weight:700}
+  .login-app-title{color:#fff;font-size:26px;font-weight:900;margin-top:4px}
+  .login-app-title span{color:#7DD3FC}
+  .login-sub{color:rgba(255,255,255,.65);font-size:13px;margin-top:4px}
+  .login-form{flex:1;background:#F0F4FF;border-radius:28px 28px 0 0;padding:32px 24px}
+  .login-form h2{color:#003087;font-size:20px;font-weight:800;margin-bottom:4px}
+  .login-form p{color:#64748B;font-size:13px;margin-bottom:24px}
+  .field{margin-bottom:16px}
+  .field label{display:block;color:#334155;font-size:12px;font-weight:600;margin-bottom:8px}
+  .field input{width:100%;padding:14px 16px;background:#fff;border:1.5px solid #E2E8F0;
+    border-radius:12px;color:#1E293B;font-size:14px;outline:none}
+  .btn-primary{width:100%;padding:16px;margin-top:8px;
+    background:linear-gradient(135deg,#0066CC,#0047AB);border:none;border-radius:14px;
+    color:#fff;font-size:16px;font-weight:700;cursor:pointer;
+    box-shadow:0 8px 24px rgba(0,71,171,.4)}
+  .forgot{text-align:center;margin-top:18px;color:#94A3B8;font-size:13px;cursor:pointer}
+
+  /* APP HEADER */
+  #app-header{background:linear-gradient(160deg,#0047AB 0%,#0066CC 100%);
+    padding:0 0 28px;position:relative;overflow:hidden;flex-shrink:0}
+  #app-header::before{content:'';position:absolute;top:-40px;right:-40px;
+    width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.05)}
+  #app-header::after{content:'';position:absolute;bottom:-60px;left:-30px;
+    width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+  .header-logo-wrap{padding:52px 20px 20px;display:flex;justify-content:center}
+  .header-ete-card{background:#fff;border-radius:14px;padding:12px 20px;text-align:center;
+    box-shadow:0 8px 28px rgba(0,0,0,.2)}
+  .header-ete-badge{background:#003087;border-radius:7px;padding:6px 13px;
+    margin-bottom:5px;display:inline-block}
+  .header-ete-badge span{font-size:22px;font-weight:900;letter-spacing:2px;
+    background:linear-gradient(90deg,#FFD700,#FF4444,#00CC44,#FFD700);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .header-ete-badge small{display:block;color:#fff;font-size:7px;letter-spacing:2px}
+  .header-ete-school{color:#003087;font-size:10px;font-weight:700}
+  .header-icons{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;
+    margin-top:8px;max-width:200px;margin-left:auto;margin-right:auto;font-size:13px}
+  .header-greeting{padding:0 20px}
+  .header-name{color:#fff;font-size:24px;font-weight:800;margin-bottom:4px}
+  .header-welcome{color:rgba(255,255,255,.75);font-size:13px;margin-bottom:16px}
+  .header-pill{background:rgba(255,255,255,.15);backdrop-filter:blur(8px);
+    border-radius:50px;padding:10px 16px;display:flex;gap:12px;align-items:center;
+    border:1px solid rgba(255,255,255,.2);flex-wrap:wrap}
+  .header-pill span{color:#fff;font-size:12px;font-weight:600}
+  .pill-divider{width:1px;height:18px;background:rgba(255,255,255,.3)}
+
+  /* CONTENT */
+  #content{overflow-y:auto;flex:1;background:#F0F4FF;border-radius:16px 16px 0 0;
+    margin-top:-12px;padding-bottom:80px}
+  .tab-pane{display:none;padding:24px 16px 0}
+  .tab-pane.active{display:block}
+
+  /* CARDS GRID */
+  .cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .card{background:#fff;border-radius:18px;padding:16px;cursor:pointer;
+    box-shadow:0 2px 16px rgba(0,71,171,.08)}
+  .card-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;
+    justify-content:center;font-size:22px;margin-bottom:10px}
+  .card-title{font-size:15px;font-weight:700;margin-bottom:4px}
+  .card-sub{color:#94A3B8;font-size:12px;line-height:1.4;margin-bottom:10px}
+  .card-footer{display:flex;justify-content:space-between;align-items:center}
+  .card-badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+  .card-arrow{font-size:18px}
+
+  /* AVISO DESTAQUE */
+  .aviso-destaque{background:#fff;border-radius:18px;padding:14px 16px;
+    margin-bottom:20px;box-shadow:0 2px 16px rgba(0,71,171,.08);
+    display:flex;justify-content:space-between;align-items:flex-start}
+  .aviso-tag{background:#DBEAFE;color:#1D4ED8;font-size:10px;font-weight:700;
+    padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:8px}
+  .aviso-txt{color:#1E293B;font-size:14px}
+  .ver-todos{background:none;border:none;color:#2563EB;font-size:12px;
+    font-weight:600;cursor:pointer;white-space:nowrap;margin-left:12px}
+
+  /* ACESSO RÁPIDO */
+  .section-title{color:#1E293B;font-size:17px;font-weight:700;margin-bottom:14px}
+  .quick-access{display:flex;justify-content:space-between;margin-bottom:8px}
+  .quick-btn{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;border:none;background:none}
+  .quick-icon{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;
+    justify-content:center;font-size:24px}
+  .quick-label{color:#475569;font-size:10px;text-align:center;line-height:1.3}
+
+  /* RELÓGIO */
+  .clock-card{background:#fff;border-radius:18px;padding:14px 16px;margin-top:16px;
+    display:flex;justify-content:space-between;align-items:center;
+    box-shadow:0 2px 16px rgba(0,71,171,.08)}
+  .clock-day{color:#64748B;font-size:11px;margin-bottom:2px}
+  .clock-time{color:#003087;font-size:26px;font-weight:900;letter-spacing:-1px}
+  .clock-time .secs{font-size:16px;color:#94A3B8}
+  .clock-date{color:#94A3B8;font-size:11px}
+  .clock-live{text-align:right}
+  .live-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;
+    display:inline-block;margin-bottom:6px;animation:pulse 2s infinite}
+  .live-disc{color:#1E293B;font-size:12px;font-weight:600;margin-bottom:4px}
+  .progress-bar-wrap{background:#E2E8F0;border-radius:4px;height:5px;width:80px;margin-left:auto}
+  .progress-bar{height:5px;border-radius:4px;transition:width 1s linear}
+  .progress-pct{color:#94A3B8;font-size:10px;margin-top:3px;text-align:right}
+
+  /* AVISOS PAGE */
+  .avisos-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .page-title{color:#1E293B;font-size:18px;font-weight:700}
+  .mark-read{background:none;border:none;color:#2563EB;font-size:12px;font-weight:600;cursor:pointer}
+  .aviso-item{background:#fff;border-radius:16px;padding:14px 16px;margin-bottom:12px;
+    cursor:pointer;box-shadow:0 2px 12px rgba(0,71,171,.07);
+    border-left:4px solid #2563EB;display:flex;gap:10px;align-items:flex-start}
+  .aviso-item.read{border-left-color:#E2E8F0;opacity:.7}
+  .aviso-content{flex:1}
+  .aviso-item-tag{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;
+    display:inline-block;margin-bottom:6px}
+  .aviso-item-txt{color:#1E293B;font-size:14px;margin-bottom:4px}
+  .aviso-item-time{color:#94A3B8;font-size:11px}
+  .unread-dot{width:8px;height:8px;border-radius:50%;background:#2563EB;margin-top:4px;flex-shrink:0}
+
+  /* AULAS PAGE */
+  .day-selector{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto;padding-bottom:4px}
+  .day-btn{padding:9px 16px;border-radius:12px;border:none;cursor:pointer;flex-shrink:0;
+    font-weight:600;font-size:13px;box-shadow:0 2px 8px rgba(0,71,171,.1)}
+  .day-btn.active{background:linear-gradient(135deg,#0066CC,#0047AB);color:#fff}
+  .day-btn.today{background:#DBEAFE;color:#1D4ED8}
+  .day-btn.normal{background:#fff;color:#64748B}
+  .day-lbl{color:#2563EB;font-size:13px;font-weight:600;margin-bottom:14px}
+  .aula-item{background:#fff;border-radius:16px;padding:14px 16px;margin-bottom:12px;
+    cursor:pointer;box-shadow:0 2px 12px rgba(0,71,171,.07);border:1.5px solid transparent}
+  .aula-item.live{border-color:var(--cor)}
+  .aula-item.done{opacity:.6}
+  .aula-inner{display:flex;align-items:center;gap:14px}
+  .aula-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;
+    justify-content:center;font-size:22px;flex-shrink:0}
+  .aula-info{flex:1;min-width:0}
+  .aula-name{color:#1E293B;font-size:14px;font-weight:700;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .aula-meta{color:#94A3B8;font-size:12px;margin-top:2px}
+  .aula-note{margin-top:6px;background:#F8FAFC;border-radius:8px;padding:4px 8px;
+    color:#64748B;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .aula-status{font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;
+    color:#fff;flex-shrink:0}
+  .aula-check{color:#16A34A;font-size:12px}
+  .aula-arrow{color:#CBD5E1;font-size:20px}
+  .sub-title{color:#1E293B;font-size:16px;font-weight:700;margin:20px 0 12px}
+  .andamento-item{background:#fff;border-radius:14px;padding:12px 16px;margin-bottom:10px;
+    cursor:pointer;display:flex;align-items:center;gap:12px;
+    box-shadow:0 2px 8px rgba(0,71,171,.07)}
+  .and-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;
+    justify-content:center;font-size:18px;flex-shrink:0}
+  .and-name{color:#1E293B;font-size:13px;font-weight:600}
+  .and-note{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* TURMAS PAGE */
+  .turma-card{background:#fff;border-radius:18px;overflow:hidden;
+    box-shadow:0 2px 16px rgba(0,71,171,.08);margin-bottom:16px}
+  .turma-header{background:linear-gradient(135deg,#0066CC,#0047AB);padding:16px 20px}
+  .turma-header small{color:rgba(255,255,255,.7);font-size:11px;letter-spacing:1px}
+  .turma-header h3{color:#fff;font-size:20px;font-weight:800;margin:4px 0}
+  .turma-header p{color:rgba(255,255,255,.7);font-size:13px}
+  .turma-body{padding:16px 20px}
+  .disc-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F1F5F9}
+  .disc-row:last-child{border-bottom:none}
+  .disc-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;
+    justify-content:center;font-size:16px;flex-shrink:0}
+  .disc-name{color:#1E293B;font-size:13px;font-weight:600}
+  .disc-prof{color:#94A3B8;font-size:11px}
+  .disc-code{color:#94A3B8;font-size:11px;font-weight:700;margin-left:auto}
+
+  /* MATERIAIS PAGE */
+  .material-item{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;
+    cursor:pointer;display:flex;align-items:center;gap:14px;
+    box-shadow:0 2px 8px rgba(0,71,171,.07)}
+  .mat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;
+    justify-content:center;color:#fff;font-size:9px;font-weight:700;flex-shrink:0}
+  .mat-name{color:#1E293B;font-size:14px;font-weight:600;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mat-meta{color:#94A3B8;font-size:12px;margin-top:2px}
+  .mat-dl{color:#CBD5E1;font-size:20px;margin-left:auto}
+
+  /* PERFIL PAGE */
+  .perfil-banner{background:linear-gradient(135deg,#0066CC,#0047AB);border-radius:20px;
+    padding:24px;margin-bottom:16px;text-align:center}
+  .perfil-avatar{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.2);
+    display:flex;align-items:center;justify-content:center;font-size:34px;
+    margin:0 auto 12px}
+  .perfil-name{color:#fff;font-size:20px;font-weight:800}
+  .perfil-curso{color:rgba(255,255,255,.7);font-size:13px}
+  .perfil-item{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;
+    display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,71,171,.07)}
+  .perfil-label{color:#94A3B8;font-size:11px}
+  .perfil-val{color:#1E293B;font-size:14px;font-weight:600}
+  .btn-logout{width:100%;padding:14px;margin-top:8px;background:#FEE2E2;
+    border:none;border-radius:14px;color:#DC2626;font-size:14px;font-weight:700;cursor:pointer}
+
+  /* BOTTOM NAV */
+  #bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+    width:100%;max-width:430px;background:#fff;border-top:1px solid #E2E8F0;
+    display:flex;padding:10px 0 18px;box-shadow:0 -4px 20px rgba(0,71,171,.08);z-index:100}
+  .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+    background:none;border:none;cursor:pointer;position:relative;padding:2px 0}
+  .nav-icon{font-size:22px;transition:filter .2s,opacity .2s}
+  .nav-btn.inactive .nav-icon{filter:grayscale(1);opacity:.5}
+  .nav-lbl{font-size:10px;font-weight:600}
+  .nav-btn.active .nav-lbl{color:#0047AB}
+  .nav-btn.inactive .nav-lbl{color:#94A3B8}
+  .nav-indicator{position:absolute;bottom:-6px;width:24px;height:3px;
+    border-radius:2px;background:#0047AB}
+  .nav-badge{position:absolute;top:0;right:calc(50% - 20px);width:16px;height:16px;
+    background:#DC2626;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;color:#fff;font-size:9px;font-weight:700}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:600;
+    display:none;align-items:flex-end;justify-content:center}
+  .modal-overlay.open{display:flex}
+  .modal-box{width:100%;max-width:430px;background:#fff;border-radius:24px 24px 0 0;
+    padding:24px;animation:slideUp .3s}
+  .modal-header{display:flex;gap:12px;align-items:center;margin-bottom:20px}
+  .modal-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;
+    justify-content:center;font-size:24px;flex-shrink:0}
+  .modal-title{color:#1E293B;font-size:17px;font-weight:700}
+  .modal-meta{color:#64748B;font-size:12px;margin-top:2px}
+  .modal-section{background:#F8FAFC;border-radius:12px;padding:14px;margin-bottom:14px}
+  .modal-section-lbl{color:#64748B;font-size:11px;font-weight:600;margin-bottom:6px}
+  .modal-section-val{color:#1E293B;font-size:15px;font-weight:600}
+  .modal-note-lbl{color:#64748B;font-size:12px;font-weight:600;margin-bottom:8px}
+  textarea{width:100%;min-height:110px;background:#F8FAFC;border:1.5px solid #E2E8F0;
+    border-radius:12px;color:#1E293B;font-size:14px;padding:12px;outline:none;resize:none}
+
+  /* TOAST */
+  #toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);
+    background:#003087;color:#fff;padding:12px 22px;border-radius:12px;
+    z-index:9999;font-size:13px;white-space:nowrap;
+    box-shadow:0 8px 24px rgba(0,0,0,.25);animation:fadeUp .3s;
+    display:none;pointer-events:none}
+
+  /* ANIMATIONS */
+  @keyframes popIn{0%{transform:scale(.7);opacity:0}80%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  @keyframes blink{from{opacity:.2}to{opacity:1}}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ TOAST ══ -->
+  <div id="toast"></div>
+
+  <!-- ══ MODAL ANDAMENTO ══ -->
+  <div class="modal-overlay" id="modal-and">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-icon" id="m-and-icon"></div>
+        <div>
+          <div class="modal-title" id="m-and-title"></div>
+          <div class="modal-meta" id="m-and-meta"></div>
+        </div>
+      </div>
+      <div class="modal-note-lbl">📍 ONDE PAREI / OBSERVAÇÕES</div>
+      <textarea id="m-and-textarea" placeholder="Ex: Terminamos pág. 45, exercícios 1–5..."></textarea>
+      <button class="btn-primary" style="margin-top:14px" onclick="saveAndamento()">💾 Salvar Progresso</button>
+    </div>
+  </div>
+
+  <!-- ══ MODAL AULA DETALHE ══ -->
+  <div class="modal-overlay" id="modal-aula">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-icon" id="m-aula-icon"></div>
+        <div>
+          <div class="modal-title" id="m-aula-title"></div>
+          <div class="modal-meta" id="m-aula-meta"></div>
+        </div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-lbl">PROFESSOR</div>
+        <div class="modal-section-val" id="m-aula-prof"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-lbl">ONDE PARAMOS</div>
+        <div class="modal-section-val" id="m-aula-note" style="font-size:14px;font-weight:400;color:#94A3B8"></div>
+      </div>
+      <button class="btn-primary" id="m-aula-edit-btn">✏️ Editar Progresso</button>
+    </div>
+  </div>
+
+  <!-- ══ SPLASH ══ -->
+  <div id="splash" class="screen active">
+    <div class="splash-logo">
+      <div class="ete-card">
+        <div class="ete-badge">
+          <span>ETE</span>
+          <small>ESCOLA TÉCNICA ESTADUAL</small>
+        </div>
+        <div class="ete-school">LUIZ ALVES LACERDA</div>
+      </div>
+    </div>
+    <div class="splash-title">tec<span>Edu</span></div>
+    <div class="splash-sub">Plataforma do Professor</div>
+    <div class="dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+
+  <!-- ══ LOGIN ══ -->
+  <div id="login" class="screen">
+    <div class="login-top">
+      <div class="login-ete-card">
+        <div class="login-ete-badge">
+          <span>ETE</span>
+          <small>ESCOLA TÉCNICA ESTADUAL</small>
+        </div>
+        <div class="login-ete-school">LUIZ ALVES LACERDA</div>
+      </div>
+      <div class="login-app-title">tec<span>Edu</span></div>
+      <div class="login-sub">Plataforma do Professor</div>
+    </div>
+    <div class="login-form">
+      <h2>Entrar na conta</h2>
+      <p>Acesse sua plataforma educacional</p>
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" value="graziela@ete.edu.br"/>
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" value="12345678"/>
+      </div>
+      <button class="btn-primary" onclick="goApp()">Entrar</button>
+      <div class="forgot">Esqueci minha senha</div>
+    </div>
+  </div>
+
+  <!-- ══ APP ══ -->
+  <div id="app-screen" class="screen" style="flex-direction:column">
+
+    <!-- HEADER AZUL -->
+    <div id="app-header">
+      <div class="header-logo-wrap">
+        <div class="header-ete-card">
+          <div class="header-ete-badge">
+            <span>ETE</span>
+            <small>ESCOLA TÉCNICA ESTADUAL</small>
+          </div>
+          <div class="header-ete-school">LUIZ ALVES LACERDA</div>
+          <div class="header-icons">🔗💡⌨️🤖▶️❤️📤✉️▶️📷#👍🖩⭐</div>
+        </div>
+      </div>
+      <div class="header-greeting">
+        <div class="header-name">Olá, Graziela! 👋</div>
+        <div class="header-welcome">Bem-vindo ao App da ETE Luiz Alves Lacerda</div>
+        <div class="header-pill">
+          <span>🎓 Desenvolvimento de Sistemas</span>
+          <div class="pill-divider"></div>
+          <span>👥 1º Módulo · I TDS B</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div id="content">
+
+      <!-- HOME -->
+      <div id="tab-home" class="tab-pane active">
+        <div class="cards-grid">
+          <!-- Mural -->
+          <div class="card" onclick="setTab('avisos')">
+            <div class="card-icon" style="background:#2563EB">📢</div>
+            <div class="card-title" style="color:#2563EB">Mural de Avisos</div>
+            <div class="card-sub">Notícias e comunicados em tempo real</div>
+            <div class="card-footer">
+              <div class="card-badge" id="mural-badge" style="background:#EFF6FF;color:#2563EB"></div>
+              <div class="card-arrow" style="color:#2563EB">›</div>
+            </div>
+          </div>
+          <!-- Próxima Aula -->
+          <div class="card" onclick="setTab('aulas')">
+            <div class="card-icon" style="background:#16A34A">📖</div>
+            <div class="card-title" style="color:#16A34A">Próxima Aula</div>
+            <div class="card-sub">Veja o que vai rolar na aula seguinte</div>
+            <div class="card-footer">
+              <div id="proxima-badge" class="card-badge" style="background:#F0FDF4;color:#16A34A"></div>
+              <div class="card-arrow" style="color:#16A34A">›</div>
+            </div>
+          </div>
+          <!-- Andamento -->
+          <div class="card" onclick="setTab('aulas')">
+            <div class="card-icon" style="background:#EA580C">📍</div>
+            <div class="card-title" style="color:#EA580C">Andamento das Aulas</div>
+            <div class="card-sub">Acompanhe onde paramos</div>
+            <div class="card-footer">
+              <div id="andamento-badge" class="card-badge" style="background:#FFF7ED;color:#EA580C;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+              <div class="card-arrow" style="color:#EA580C">›</div>
+            </div>
+          </div>
+          <!-- Materiais -->
+          <div class="card" onclick="setTab('materiais')">
+            <div class="card-icon" style="background:#7C3AED">📁</div>
+            <div class="card-title" style="color:#7C3AED">Materiais</div>
+            <div class="card-sub">Arquivos e downloads das aulas</div>
+            <div class="card-footer">
+              <div class="card-badge" style="background:#F5F3FF;color:#7C3AED">📎 6 arquivos</div>
+              <div class="card-arrow" style="color:#7C3AED">›</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aviso destaque -->
+        <div class="aviso-destaque">
+          <div style="flex:1">
+            <div class="aviso-tag">AVISO IMPORTANTE</div>
+            <div class="aviso-txt">Entrega do projeto final até 25/04! 💻</div>
+          </div>
+          <button class="ver-todos" onclick="setTab('avisos')">Ver todos ›</button>
+        </div>
+
+        <!-- Acesso Rápido -->
+        <div class="section-title">Acesso Rápido</div>
+        <div class="quick-access">
+          <button class="quick-btn" onclick="showToast('Mensagens em breve!')">
+            <div class="quick-icon" style="background:#DC2626;box-shadow:0 4px 14px rgba(220,38,38,.4)">✉️</div>
+            <div class="quick-label">Mensagens</div>
+          </button>
+          <button class="quick-btn" onclick="showToast('Calendário em breve!')">
+            <div class="quick-icon" style="background:#2563EB;box-shadow:0 4px 14px rgba(37,99,235,.4)">📅</div>
+            <div class="quick-label">Calendário</div>
+          </button>
+          <button class="quick-btn" onclick="showToast('Presença em breve!')">
+            <div class="quick-icon" style="background:#16A34A;box-shadow:0 4px 14px rgba(22,163,74,.4)">✅</div>
+            <div class="quick-label">Presença</div>
+          </button>
+          <button class="quick-btn" onclick="showToast('Envio em breve!')">
+            <div class="quick-icon" style="background:#EA580C;box-shadow:0 4px 14px rgba(234,88,12,.4)">☁️</div>
+            <div class="quick-label">Enviar<br>Atividade</div>
+          </button>
+          <button class="quick-btn" onclick="setTab('perfil')">
+            <div class="quick-icon" style="background:#1E3A5F;box-shadow:0 4px 14px rgba(30,58,95,.4)">👤</div>
+            <div class="quick-label">Perfil</div>
+          </button>
+        </div>
+
+        <!-- Relógio -->
+        <div class="clock-card">
+          <div>
+            <div class="clock-day" id="clock-day">—</div>
+            <div class="clock-time"><span id="clock-hm">--:--</span><span class="secs">:<span id="clock-s">--</span></span></div>
+            <div class="clock-date" id="clock-date">—</div>
+          </div>
+          <div class="clock-live" id="clock-live"></div>
+        </div>
+      </div>
+
+      <!-- AVISOS -->
+      <div id="tab-avisos" class="tab-pane">
+        <div class="avisos-header">
+          <div class="page-title">Mural de Avisos</div>
+          <button class="mark-read" onclick="markAllRead()">Marcar tudo lido</button>
+        </div>
+        <div id="avisos-list"></div>
+      </div>
+
+      <!-- AULAS -->
+      <div id="tab-aulas" class="tab-pane">
+        <div class="page-title" style="margin-bottom:16px">Grade de Aulas</div>
+        <div class="day-selector" id="day-selector"></div>
+        <div class="day-lbl" id="day-lbl"></div>
+        <div id="aulas-list"></div>
+        <div class="sub-title">Registrar Andamento</div>
+        <div id="andamento-list"></div>
+      </div>
+
+      <!-- TURMAS -->
+      <div id="tab-turmas" class="tab-pane">
+        <div class="page-title" style="margin-bottom:4px">Turmas</div>
+        <div style="color:#94A3B8;font-size:13px;margin-bottom:20px">Desenvolvimento de Sistemas · 1º Módulo</div>
+        <div class="turma-card">
+          <div class="turma-header">
+            <small>TURMA PRINCIPAL</small>
+            <h3>I TDS B</h3>
+            <p>Sala 10 · 1º Módulo</p>
+          </div>
+          <div class="turma-body" id="turma-body"></div>
+        </div>
+      </div>
+
+      <!-- MATERIAIS -->
+      <div id="tab-materiais" class="tab-pane">
+        <div class="page-title" style="margin-bottom:4px">Materiais</div>
+        <div style="color:#94A3B8;font-size:13px;margin-bottom:20px">6 arquivos disponíveis</div>
+        <div id="materiais-list"></div>
+      </div>
+
+      <!-- PERFIL -->
+      <div id="tab-perfil" class="tab-pane">
+        <div class="perfil-banner">
+          <div class="perfil-avatar">👩‍🏫</div>
+          <div class="perfil-name">Prof. Graziela</div>
+          <div class="perfil-curso">Desenvolvimento de Sistemas</div>
+        </div>
+        <div class="perfil-item"><span style="font-size:22px">🏫</span><div><div class="perfil-label">Escola</div><div class="perfil-val">ETE Luiz Alves Lacerda</div></div></div>
+        <div class="perfil-item"><span style="font-size:22px">📚</span><div><div class="perfil-label">Módulo</div><div class="perfil-val">1º Módulo</div></div></div>
+        <div class="perfil-item"><span style="font-size:22px">👥</span><div><div class="perfil-label">Turma</div><div class="perfil-val">I TDS B · Sala 10</div></div></div>
+        <div class="perfil-item"><span style="font-size:22px">📅</span><div><div class="perfil-label">Ano letivo</div><div class="perfil-val">2025</div></div></div>
+        <button class="btn-logout" onclick="goLogin()">Sair da conta</button>
+      </div>
+
+    </div><!-- /content -->
+
+    <!-- BOTTOM NAV -->
+    <div id="bottom-nav">
+      <button class="nav-btn active" onclick="setTab('home')" data-tab="home">
+        <div class="nav-icon">🏠</div>
+        <div class="nav-lbl">Início</div>
+        <div class="nav-indicator"></div>
+      </button>
+      <button class="nav-btn inactive" onclick="setTab('avisos')" data-tab="avisos">
+        <div class="nav-badge" id="nav-badge" style="display:none"></div>
+        <div class="nav-icon">📢</div>
+        <div class="nav-lbl">Avisos</div>
+      </button>
+      <button class="nav-btn inactive" onclick="setTab('aulas')" data-tab="aulas">
+        <div class="nav-icon">💬</div>
+        <div class="nav-lbl">Aulas</div>
+      </button>
+      <button class="nav-btn inactive" onclick="setTab('turmas')" data-tab="turmas">
+        <div class="nav-icon">👥</div>
+        <div class="nav-lbl">Turmas</div>
+      </button>
+      <button class="nav-btn inactive" onclick="setTab('perfil')" data-tab="perfil">
+        <div class="nav-icon">👤</div>
+        <div class="nav-lbl">Perfil</div>
+      </button>
+    </div>
+
+  </div><!-- /app-screen -->
+</div><!-- /app -->
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   DADOS
+════════════════════════════════════════════════════════════════ */
+const DISCIPLINAS = {
+  DT:   {nome:"Design Thinking",                      cor:"#F59E0B",prof:"Alexandra",emoji:"🎨"},
+  ADB:  {nome:"Adm. de Banco de Dados",               cor:"#A855F7",prof:"Will",     emoji:"🗄️"},
+  PNT:  {nome:"Prog. Novas Tecnologias (Desktop)",    cor:"#3B82F6",prof:"Marcos",   emoji:"💻"},
+  PI1:  {nome:"Projeto Integrador I",                 cor:"#EC4899",prof:"Grazi",    emoji:"🚀"},
+  HSCE: {nome:"Hab. Socioemoc. e Comp. Empreendedor", cor:"#64748B",prof:"EAD",      emoji:"🤝"},
+  LPC:  {nome:"Lógica e Pensamento Computacional",    cor:"#22C55E",prof:"Marcos",   emoji:"🧠"},
+  DCU:  {nome:"Design Centrado no Usuário",           cor:"#06B6D4",prof:"Grazi",    emoji:"🖌️"},
+  AC:   {nome:"Atividades Complementares",            cor:"#475569",prof:"—",        emoji:"📋"},
+};
+
+const GRADE = {
+  0:{1:"DT", 2:"DT", 3:"PNT",4:"PNT",5:"HSCE"},
+  1:{1:"ADB",2:"ADB",3:"PI1",4:"PI1",5:"HSCE"},
+  2:{1:"LPC",2:"LPC",3:"ADB",4:"ADB",5:"AC"},
+  3:{1:"DCU",2:"DCU",3:"LPC",4:"LPC",5:"AC"},
+  4:{1:"PNT",2:"PNT",3:"LPC",4:"LPC",5:"AC"},
+};
+
+const AULAS = [
+  {num:1,inicio:"18:40",fim:"19:20"},
+  {num:2,inicio:"19:20",fim:"20:00"},
+  {num:3,inicio:"20:00",fim:"20:40"},
+  {num:4,inicio:"20:40",fim:"21:20"},
+  {num:5,inicio:"21:20",fim:"22:00"},
+];
+
+const DIAS_LONGO = ["Segunda","Terça","Quarta","Quinta","Sexta"];
+const DIAS_CURTO = ["Seg","Ter","Qua","Qui","Sex"];
+
+const MATERIAIS = [
+  {id:1,nome:"Slides – Design Thinking",  disc:"DT", tipo:"PDF", size:"2.4 MB"},
+  {id:2,nome:"Lista de Exercícios – LPC", disc:"LPC",tipo:"PDF", size:"890 KB"},
+  {id:3,nome:"Banco de Dados – Intro",    disc:"ADB",tipo:"PPTX",size:"5.1 MB"},
+  {id:4,nome:"Figma – Protótipo DCU",     disc:"DCU",tipo:"LINK",size:"—"},
+  {id:5,nome:"Enunciado PI I",            disc:"PI1",tipo:"DOCX",size:"340 KB"},
+  {id:6,nome:"Apostila PNT Desktop",      disc:"PNT",tipo:"PDF", size:"3.7 MB"},
+];
+
+/* ════════════════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════════════════ */
+let avisos = [
+  {id:1,tag:"AVISO IMPORTANTE",txt:"Entrega do projeto final até 25/04! 💻",     time:"Hoje",        read:false},
+  {id:2,tag:"INFORMATIVO",     txt:"Reunião de pais e mestres na sexta às 19h",  time:"Ontem",       read:false},
+  {id:3,tag:"LEMBRETE",        txt:"Semana de provas: 28/04 a 02/05",            time:"2 dias atrás",read:true},
+];
+let andamento = {
+  DT: "Terminamos pág. 45, exercícios 1–5. Turma engajada.",
+  LPC:"Aula sobre estruturas de repetição – while. Próx: for.",
+  ADB:"Modelagem ER finalizada. Iniciar SQL na próxima aula.",
+};
+let selDay = null;
+let editAndCode = null;
+let editAulaCode = null;
+
+/* ════════════════════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════════════════ */
+function toMin(t){const[h,m]=t.split(":").map(Number);return h*60+m;}
+function padZ(n){return String(n).padStart(2,"0");}
+
+function getTodayIdx(){
+  const d=new Date().getDay();
+  return d>=1&&d<=5?d-1:null;
+}
+function getActiveDay(){
+  return selDay!==null?selDay:(getTodayIdx()!==null?getTodayIdx():0);
+}
+function getNowMin(){
+  const n=new Date();
+  return n.getHours()*60+n.getMinutes();
+}
+function getAulaAtual(){
+  const ti=getTodayIdx();
+  if(ti===null)return null;
+  const nm=getNowMin();
+  return AULAS.find(a=>toMin(a.inicio)<=nm&&nm<toMin(a.fim))||null;
+}
+function getProxima(){
+  const ti=getTodayIdx();
+  if(ti===null)return null;
+  const nm=getNowMin();
+  return AULAS.find(a=>toMin(a.inicio)>nm)||null;
+}
+function getUnread(){return avisos.filter(a=>!a.read).length;}
+
+/* ════════════════════════════════════════════════════════════════
+   SCREENS
+════════════════════════════════════════════════════════════════ */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function goApp(){showScreen('app-screen');renderAll();}
+function goLogin(){showScreen('login');}
+
+/* ════════════════════════════════════════════════════════════════
+   TABS
+════════════════════════════════════════════════════════════════ */
+function setTab(t){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    const isActive=b.dataset.tab===t;
+    b.className='nav-btn '+(isActive?'active':'inactive');
+    const ind=b.querySelector('.nav-indicator');
+    if(ind) ind.style.display=isActive?'block':'none';
+  });
+  // re-render relevant tab
+  if(t==='avisos')   renderAvisos();
+  if(t==='aulas')    renderAulas();
+  if(t==='turmas')   renderTurmas();
+  if(t==='materiais')renderMateriais();
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════════════════════ */
+let toastTimer=null;
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.style.display='block';
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.style.display='none',2600);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   CLOCK (real-time)
+════════════════════════════════════════════════════════════════ */
+function updateClock(){
+  const n=new Date();
+  const ti=getTodayIdx();
+  document.getElementById('clock-hm').textContent=padZ(n.getHours())+':'+padZ(n.getMinutes());
+  document.getElementById('clock-s').textContent=padZ(n.getSeconds());
+  document.getElementById('clock-day').textContent=ti!==null?DIAS_LONGO[ti]+'-feira':'Fim de semana';
+  document.getElementById('clock-date').textContent=n.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+
+  const aa=getAulaAtual();
+  const liveEl=document.getElementById('clock-live');
+  if(aa&&ti!==null){
+    const code=GRADE[ti][aa.num];
+    const d=DISCIPLINAS[code]||{};
+    const nm=getNowMin();
+    const pct=Math.min(100,Math.round((nm-toMin(aa.inicio))/(toMin(aa.fim)-toMin(aa.inicio))*100));
+    const shortName=d.nome.length>20?d.nome.slice(0,20)+'…':d.nome;
+    liveEl.innerHTML=`
+      <div class="live-badge" style="background:${d.cor}22;border:1px solid ${d.cor}44;color:${d.cor}">● AULA AO VIVO</div>
+      <div class="live-disc">${shortName}</div>
+      <div class="progress-bar-wrap"><div class="progress-bar" style="width:${pct}%;background:${d.cor}"></div></div>
+      <div class="progress-pct">${pct}%</div>`;
+  } else {
+    const pr=getProxima();
+    liveEl.innerHTML=`<div style="color:#94A3B8;font-size:12px">${pr?'Próxima: '+pr.inicio:'Sem aulas agora'}</div>`;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   HOME dynamic badges
+════════════════════════════════════════════════════════════════ */
+function updateHomeBadges(){
+  // mural
+  const ur=getUnread();
+  const mb=document.getElementById('mural-badge');
+  mb.textContent=ur>0?ur+' novas':'';
+  mb.style.display=ur>0?'inline-block':'none';
+  // nav badge
+  const nb=document.getElementById('nav-badge');
+  nb.textContent=ur;
+  nb.style.display=ur>0?'flex':'none';
+  // proxima
+  const pr=getProxima();
+  const ti=getTodayIdx();
+  const pb=document.getElementById('proxima-badge');
+  if(pr&&ti!==null){pb.textContent='🕐 Hoje, '+pr.inicio;pb.style.display='inline-block';}
+  else{pb.textContent='Sem próximas aulas';pb.style.display='inline-block';}
+  // andamento
+  const keys=Object.keys(andamento);
+  const ab=document.getElementById('andamento-badge');
+  if(keys.length){
+    const last=keys[keys.length-1];
+    ab.textContent='📖 '+last+' · '+andamento[last].slice(0,18)+'…';
+  } else {
+    ab.textContent='Nenhum registro';
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   AVISOS
+════════════════════════════════════════════════════════════════ */
+const tagStyles={
+  'AVISO IMPORTANTE':{bg:'#DBEAFE',c:'#1D4ED8'},
+  'INFORMATIVO':     {bg:'#DCFCE7',c:'#166534'},
+  'LEMBRETE':        {bg:'#FEF3C7',c:'#92400E'},
+};
+function renderAvisos(){
+  const el=document.getElementById('avisos-list');
+  el.innerHTML=avisos.map(a=>{
+    const ts=tagStyles[a.tag]||{bg:'#F1F5F9',c:'#475569'};
+    return `<div class="aviso-item ${a.read?'read':''}" onclick="readAviso(${a.id})">
+      <div class="aviso-content">
+        <div class="aviso-item-tag" style="background:${ts.bg};color:${ts.c}">${a.tag}</div>
+        <div class="aviso-item-txt">${a.txt}</div>
+        <div class="aviso-item-time">${a.time}</div>
+      </div>
+      ${!a.read?'<div class="unread-dot"></div>':''}
+    </div>`;
+  }).join('');
+}
+function readAviso(id){
+  avisos=avisos.map(a=>a.id===id?{...a,read:true}:a);
+  renderAvisos();updateHomeBadges();
+}
+function markAllRead(){
+  avisos=avisos.map(a=>({...a,read:true}));
+  renderAvisos();updateHomeBadges();
+}
+
+/* ════════════════════════════════════════════════════════════════
+   AULAS
+════════════════════════════════════════════════════════════════ */
+function renderDaySelector(){
+  const ti=getTodayIdx();
+  const ad=getActiveDay();
+  const el=document.getElementById('day-selector');
+  el.innerHTML=DIAS_CURTO.map((d,i)=>{
+    let cls='day-btn ';
+    cls+=ad===i?'active':ti===i?'today':'normal';
+    return `<button class="${cls}" onclick="selectDay(${i})">${d}${ti===i?'<div style="font-size:8px;margin-top:1px">hoje</div>':''}</button>`;
+  }).join('');
+}
+function selectDay(i){selDay=i;renderAulas();}
+
+function renderAulas(){
+  renderDaySelector();
+  const ad=getActiveDay();
+  const ti=getTodayIdx();
+  const nm=getNowMin();
+  document.getElementById('day-lbl').textContent=DIAS_LONGO[ad]+'-feira · Sala 10';
+
+  // lista aulas
+  const el=document.getElementById('aulas-list');
+  el.innerHTML=AULAS.map(a=>{
+    const code=GRADE[ad][a.num];
+    const d=DISCIPLINAS[code]||{};
+    const isNow=ad===ti&&toMin(a.inicio)<=nm&&nm<toMin(a.fim);
+    const isDone=ad===ti&&nm>=toMin(a.fim);
+    const note=andamento[code]||'';
+    const statusBadge=isNow?`<span class="aula-status" style="background:${d.cor}">AO VIVO</span>`
+      :isDone?`<span class="aula-check">✓</span>`:'';
+    return `<div class="aula-item ${isNow?'live':''} ${isDone?'done':''}"
+      style="--cor:${d.cor};border-color:${isNow?d.cor:'transparent'};opacity:${isDone?.6:1}"
+      onclick="openModalAula('${code}',${a.num},'${a.inicio}','${a.fim}')">
+      <div class="aula-inner">
+        <div class="aula-icon" style="background:${d.cor}">${d.emoji}</div>
+        <div class="aula-info">
+          <div class="aula-name">${d.nome}</div>
+          <div class="aula-meta">Prof. ${d.prof} · ${a.inicio}–${a.fim}</div>
+          ${note?`<div class="aula-note">📍 ${note.slice(0,45)}${note.length>45?'…':''}</div>`:''}
+        </div>
+        ${statusBadge}
+        <div class="aula-arrow">›</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // andamento
+  const al=document.getElementById('andamento-list');
+  al.innerHTML=Object.entries(DISCIPLINAS).filter(([k])=>k!=='AC'&&k!=='HSCE').map(([code,d])=>`
+    <div class="andamento-item" onclick="openModalAnd('${code}')">
+      <div class="and-icon" style="background:${d.cor}22">${d.emoji}</div>
+      <div style="flex:1;min-width:0">
+        <div class="and-name">${d.nome}</div>
+        <div class="and-note" style="color:${andamento[code]?'#16A34A':'#94A3B8'}">
+          ${andamento[code]?'📍 '+andamento[code]:'Sem registro'}
+        </div>
+      </div>
+      <div style="color:#CBD5E1;font-size:18px">›</div>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   MODAL ANDAMENTO
+════════════════════════════════════════════════════════════════ */
+function openModalAnd(code){
+  editAndCode=code;
+  const d=DISCIPLINAS[code]||{};
+  document.getElementById('m-and-icon').style.background=d.cor;
+  document.getElementById('m-and-icon').textContent=d.emoji;
+  document.getElementById('m-and-title').textContent=d.nome;
+  document.getElementById('m-and-meta').textContent='Prof. '+d.prof;
+  document.getElementById('m-and-textarea').value=andamento[code]||'';
+  document.getElementById('modal-and').classList.add('open');
+}
+function saveAndamento(){
+  if(!editAndCode)return;
+  andamento[editAndCode]=document.getElementById('m-and-textarea').value;
+  document.getElementById('modal-and').classList.remove('open');
+  editAndCode=null;
+  showToast('Progresso salvo! 📍');
+  renderAulas();updateHomeBadges();
+}
+document.getElementById('modal-and').addEventListener('click',function(e){
+  if(e.target===this)this.classList.remove('open');
+});
+
+/* ════════════════════════════════════════════════════════════════
+   MODAL AULA DETALHE
+════════════════════════════════════════════════════════════════ */
+function openModalAula(code,num,inicio,fim){
+  editAulaCode=code;
+  const d=DISCIPLINAS[code]||{};
+  document.getElementById('m-aula-icon').style.background=d.cor;
+  document.getElementById('m-aula-icon').textContent=d.emoji;
+  document.getElementById('m-aula-title').textContent=d.nome;
+  document.getElementById('m-aula-meta').textContent='Aula '+num+' · '+inicio+'–'+fim;
+  document.getElementById('m-aula-prof').textContent='Prof. '+d.prof;
+  const noteEl=document.getElementById('m-aula-note');
+  noteEl.textContent=andamento[code]||'Nenhum registro ainda.';
+  noteEl.style.color=andamento[code]?'#1E293B':'#94A3B8';
+  document.getElementById('m-aula-edit-btn').style.background=`linear-gradient(135deg,${d.cor},${d.cor}cc)`;
+  document.getElementById('modal-aula').classList.add('open');
+}
+document.getElementById('m-aula-edit-btn').addEventListener('click',function(){
+  document.getElementById('modal-aula').classList.remove('open');
+  if(editAulaCode) openModalAnd(editAulaCode);
+});
+document.getElementById('modal-aula').addEventListener('click',function(e){
+  if(e.target===this)this.classList.remove('open');
+});
+
+/* ════════════════════════════════════════════════════════════════
+   TURMAS
+════════════════════════════════════════════════════════════════ */
+function renderTurmas(){
+  document.getElementById('turma-body').innerHTML=Object.entries(DISCIPLINAS).map(([code,d])=>`
+    <div class="disc-row">
+      <div class="disc-icon" style="background:${d.cor}">${d.emoji}</div>
+      <div style="flex:1">
+        <div class="disc-name">${d.nome}</div>
+        <div class="disc-prof">Prof. ${d.prof}</div>
+      </div>
+      <div class="disc-code">${code}</div>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   MATERIAIS
+════════════════════════════════════════════════════════════════ */
+function renderMateriais(){
+  const colors={PDF:'#DC2626',PPTX:'#EA580C',DOCX:'#2563EB',LINK:'#16A34A'};
+  document.getElementById('materiais-list').innerHTML=MATERIAIS.map(m=>{
+    const d=DISCIPLINAS[m.disc]||{};
+    const c=colors[m.tipo]||'#64748B';
+    return `<div class="material-item" onclick="showToast('Download iniciado! ⬇️')">
+      <div class="mat-icon" style="background:${c}">${m.tipo}</div>
+      <div style="flex:1;min-width:0">
+        <div class="mat-name">${m.nome}</div>
+        <div class="mat-meta">${d.nome} · ${m.size}</div>
+      </div>
+      <div class="mat-dl">⬇</div>
+    </div>`;
+  }).join('');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   RENDER ALL
+════════════════════════════════════════════════════════════════ */
+function renderAll(){
+  updateClock();
+  updateHomeBadges();
+  renderAvisos();
+  renderAulas();
+  renderTurmas();
+  renderMateriais();
+}
+
+/* ════════════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════════════ */
+// Nav indicators: hide all except home on load
+document.querySelectorAll('.nav-btn').forEach(b=>{
+  const ind=b.querySelector('.nav-indicator');
+  if(ind&&b.dataset.tab!=='home') ind.style.display='none';
+});
+
+// Splash → login
+setTimeout(()=>showScreen('login'), 2500);
+
+// Clock tick
+setInterval(()=>{
+  updateClock();
+  updateHomeBadges();
+}, 1000);
+</script>
+</body>
+</html>
